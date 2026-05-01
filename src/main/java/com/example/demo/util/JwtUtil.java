@@ -17,6 +17,10 @@ public class JwtUtil {
 
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
 
+    // Inside JwtUtil.java
+    @Value("${JWT_SECRET}")
+    private String secretString;
+
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
