@@ -7,5 +7,5 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jdk-alpine
 COPY --from=build /target/*.jar app.jar
 EXPOSE 8080
-# Change the last line to this:
-ENTRYPOINT ["java", "-Dspring.datasource.url=${DB_URL}", "-jar", "/app.jar"]
+# CHANGE THIS LINE: Use "sh -c" to force environment variable loading
+ENTRYPOINT ["sh", "-c", "java -jar /app.jar"]
