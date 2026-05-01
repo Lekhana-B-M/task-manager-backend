@@ -7,5 +7,5 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jdk-alpine
 COPY --from=build /target/*.jar app.jar
 EXPOSE 8080
-# CHANGE THIS LINE: Use "sh -c" to force environment variable loading
-ENTRYPOINT ["sh", "-c", "java -jar /app.jar"]
+# This line forces Java to take the Render variables directly
+ENTRYPOINT ["sh", "-c", "java -Dspring.datasource.url=${DB_URL} -Dspring.datasource.username=${DB_USER} -Dspring.datasource.password=${DB_PASSWORD} -Dserver.port=${PORT} -jar /app.jar"]
