@@ -3,6 +3,7 @@ package com.example.demo.util;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -11,6 +12,9 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class JwtUtil {
 
+    @Value("${JWT_SECRET}")
+    private String secretString;
+
     // 1. CHANGE THIS: Use a fixed long string (at least 32 characters)
     private static final String SECRET_STRING = "your-very-long-secret-key-with-at-least-32-characters-123456";
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes(StandardCharsets.UTF_8));
@@ -18,8 +22,7 @@ public class JwtUtil {
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
 
     // Inside JwtUtil.java
-    @Value("${JWT_SECRET}")
-    private String secretString;
+    
 
     public String generateToken(String email) {
         return Jwts.builder()
