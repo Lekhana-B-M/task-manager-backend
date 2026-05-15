@@ -8,5 +8,5 @@ FROM eclipse-temurin:21-jdk-alpine
 COPY --from=build /target/*.jar app.jar
 EXPOSE 8080
 
-# This form is the 'Golden Rule' for Render
-ENTRYPOINT ["sh", "-c", "java -jar /app.jar"]
+# This is the "Nuclear Option": We pass the variables directly to the Java process
+ENTRYPOINT ["sh", "-c", "java -Dspring.datasource.url=${SPRING_DATASOURCE_URL} -Dspring.datasource.username=${SPRING_DATASOURCE_USERNAME} -Dspring.datasource.password=${SPRING_DATASOURCE_PASSWORD} -Dserver.port=${PORT} -jar /app.jar"]
