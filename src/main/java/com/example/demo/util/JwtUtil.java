@@ -1,41 +1,38 @@
 package com.example.demo.util;
 
+import org.springframework.beans.factory.annotation.Value; // <--- THIS WAS MISSING
+import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import java.util.Date;
 import javax.crypto.SecretKey;
+import java.util.Date;
 import java.nio.charset.StandardCharsets;
 
 @Component
 public class JwtUtil {
 
-    @Value("${JWT_SECRET}")
-    private String secretString;
+	@Value("${app.jwt.secret}") 
+	private String secretString;
 
-    // 1. CHANGE THIS: Use a fixed long string (at least 32 characters)
-    private static final String SECRET_STRING = "your-very-long-secret-key-with-at-least-32-characters-123456";
-    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes(StandardCharsets.UTF_8));
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10;
 
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
-
-    // Inside JwtUtil.java
-    
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SECRET_KEY)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -47,12 +44,12 @@ public class JwtUtil {
     }
 
     private boolean isTokenExpired(String token) {
-        Date expiration = Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .getExpiration();
-        return expiration.before(new Date());
+                .getExpiration()
+                .before(new Date());
     }
 }
