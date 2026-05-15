@@ -8,5 +8,5 @@ FROM eclipse-temurin:21-jdk-alpine
 COPY --from=build /target/*.jar app.jar
 EXPOSE 8080
 
-# This "Shell form" ensures variables like $DB_URL are actually used
+# This form forces the OS to inject the DB_URL and other variables
 ENTRYPOINT java -Dserver.port=${PORT} -Dspring.datasource.url=${DB_URL} -Dspring.datasource.username=${DB_USER} -Dspring.datasource.password=${DB_PASSWORD} -jar /app.jar
